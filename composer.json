@@ -1,9 +1,9 @@
 {
-  "name": "BestOnion/mongo-orm",
+  "name": "BestOnion/MongoOrm",
   "description": "build in fastmongo.mongo orm",
   "autoload": {
     "psr-4": {
-      "BestOnion\\mongo-orm\\": "src/"
+      "BestOnion\\MongoOrm\\": "src/"
     }
   },
   "authors": [

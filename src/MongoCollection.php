@@ -1,6 +1,6 @@
 <?php
 
-namespace Hyperf\HyperfMongoOrm\mongo;
+namespace BestOnion\MongoOrm;
 
 use ArrayIterator;
 use IteratorAggregate;

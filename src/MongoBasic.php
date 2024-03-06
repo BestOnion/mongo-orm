@@ -1,17 +1,16 @@
 <?php
 
-namespace Hyperf\HyperfMongoOrm;
+namespace BestOnion\MongoOrm;
 
+use BestOnion\MongoOrm\Elasticsearch\EsTrait;
+use BestOnion\MongoOrm\redis\MongoRedisCache;
+use BestOnion\MongoOrm\MongoCollection;
 use Exception;
 use Hyperf\Context\ApplicationContext;
 use Hyperf\GoTask\MongoClient\Collection;
 use Hyperf\GoTask\MongoClient\MongoClient;
-use Hyperf\HyperfMongoOrm\Elasticsearch\EsTrait;
-use Hyperf\HyperfMongoOrm\mongo\MongoCollection;
-use Hyperf\HyperfMongoOrm\mongo\MongoRedisCache;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use Traversable;
 
 class MongoBasic extends DocumentArr implements \JsonSerializable
 {

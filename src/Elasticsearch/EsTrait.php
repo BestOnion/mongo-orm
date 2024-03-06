@@ -1,6 +1,6 @@
 <?php
 
-namespace Hyperf\HyperfMongoOrm\Elasticsearch;
+namespace BestOnion\MongoOrm\Elasticsearch;
 
 trait EsTrait
 {

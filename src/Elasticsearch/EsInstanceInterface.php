@@ -1,7 +1,6 @@
 <?php
 
-namespace Hyperf\HyperfMongoOrm\Elasticsearch;
-use Hyperf\HyperfMongoOrm\Elasticsearch\Es;
+namespace BestOnion\MongoOrm\Elasticsearch;
 
 interface EsInstanceInterface
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Hyperf\HyperfMongoOrm;
+namespace BestOnion\MongoOrm;
 
 class MongoModel extends MongoBasic
 {

@@ -1,8 +1,7 @@
 <?php
 
-namespace Hyperf\HyperfMongoOrm\Elasticsearch;
+namespace BestOnion\MongoOrm\Elasticsearch;
 
-use App\Utils\Log;
 use Elasticsearch\Client;
 use Hyperf\Elasticsearch\ClientBuilderFactory;
 
