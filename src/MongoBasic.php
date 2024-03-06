@@ -394,7 +394,7 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
     public function pluck($key): array
     {
         $this->columns = [$key];
-        $result = $this->getToArray();
+        $result = $this->get();
         $array = [];
         foreach ($result as $value) {
             $array[] = $value[$key];
@@ -523,7 +523,7 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
      */
     public function count(): int
     {
-        $result = $this->getToArray();
+        $result = $this->get();
         return count($result);
     }
 

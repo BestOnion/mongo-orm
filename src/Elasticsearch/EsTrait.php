@@ -29,7 +29,7 @@ trait EsTrait
     function searchableMany($ids): bool
     {
         //get data from mongo
-        $data = $this->whereIn('_id', $ids)->select($this->getEsFields())->getToArray();
+        $data = $this->whereIn('_id', $ids)->select($this->getEsFields())->get();
         //sync data to es
         return $this->syncBatch($data);
     }

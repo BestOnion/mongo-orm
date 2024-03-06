@@ -47,7 +47,7 @@ trait MongoRedisCache
         //开启管道
         $this->getRedis()->multi(\Redis::PIPELINE);
         var_dump('get from db');
-        $arr = $this->whereIn('id', $ids)->getToArray();
+        $arr = $this->whereIn('id', $ids)->get();
         $redisArr = [];
         $result = [];
         foreach ($arr as &$item) {
