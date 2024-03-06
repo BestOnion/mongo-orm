@@ -1,5 +1,5 @@
 {
-  "name": "BestOnion/MongoOrm",
+  "name": "onion/MongoOrm",
   "description": "build in fastmongo.mongo orm",
   "autoload": {
     "psr-4": {
