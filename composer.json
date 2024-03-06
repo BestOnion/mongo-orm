@@ -1,9 +1,9 @@
 {
-  "name": "hyperf/hyperf-mongo-orm",
+  "name": "BestOnion/hyperf-mongo-orm",
   "description": "build in fastmongo.mongo orm",
   "autoload": {
     "psr-4": {
-      "Hyperf\\HyperfMongoOrm\\": "src/"
+      "BestOnion\\mongo-orm\\": "src/"
     }
   },
   "authors": [
