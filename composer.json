@@ -1,0 +1,21 @@
+{
+  "name": "hyperf/hyperf-mongo-orm",
+  "description": "build in fastmongo.mongo orm",
+  "autoload": {
+    "psr-4": {
+      "Hyperf\\HyperfMongoOrm\\": "src/"
+    }
+  },
+  "authors": [
+    {
+      "name": "cong",
+      "email": "15858832318@163.com"
+    }
+  ],
+  "require": {
+    "php": "^8.1",
+    "reasno/fastmongo": "dev-master",
+    "hyperf/gotask": "v3.0.1",
+    "ext-mongodb": "*"
+  }
+}

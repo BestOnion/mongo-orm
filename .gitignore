@@ -1,0 +1,8 @@
+.project
+.git/
+.idea/
+vendor/
+.env
+composer.lock
+docker-compose.yaml
+
