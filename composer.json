@@ -1,14 +1,14 @@
 {
-  "name": "onion/mongo-orm",
+  "name": "fairwic/mongo-orm",
   "description": "build in fastmongo.mongo orm",
   "autoload": {
     "psr-4": {
-      "BestOnion\\MongoOrm\\": "src/"
+      "fairwic\\MongoOrm\\": "src/"
     }
   },
   "authors": [
     {
-      "name": "BestOnion",
+      "name": "fairwic",
       "email": "15858832318@163.com"
     }
   ],

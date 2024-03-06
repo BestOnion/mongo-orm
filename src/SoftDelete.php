@@ -1,5 +1,5 @@
 <?php
-namespace BestOnion\MongoOrm;
+namespace fairwic\MongoOrm;
 trait  SoftDelete
 {
     public function delete()

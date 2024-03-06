@@ -1,10 +1,10 @@
 <?php
 
-namespace BestOnion\MongoOrm;
+namespace fairwic\MongoOrm;
 
-use BestOnion\MongoOrm\Elasticsearch\EsTrait;
-use BestOnion\MongoOrm\redis\MongoRedisCache;
-use BestOnion\MongoOrm\MongoCollection;
+use fairwic\MongoOrm\Elasticsearch\EsTrait;
+use fairwic\MongoOrm\redis\MongoRedisCache;
+use fairwic\MongoOrm\MongoCollection;
 use Exception;
 use Hyperf\Context\ApplicationContext;
 use Hyperf\GoTask\MongoClient\Collection;

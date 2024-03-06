@@ -1,6 +1,6 @@
 <?php
 
-namespace BestOnion\MongoOrm;
+namespace fairwic\MongoOrm;
 
 use ArrayIterator;
 use IteratorAggregate;

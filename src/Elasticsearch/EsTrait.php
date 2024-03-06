@@ -1,6 +1,6 @@
 <?php
 
-namespace BestOnion\MongoOrm\Elasticsearch;
+namespace fairwic\MongoOrm\Elasticsearch;
 
 trait EsTrait
 {

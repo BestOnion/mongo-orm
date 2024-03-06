@@ -1,6 +1,6 @@
 <?php
 
-namespace BestOnion\MongoOrm;
+namespace fairwic\MongoOrm;
 class DocumentArr implements \ArrayAccess
 {
     protected array $attributes = [];

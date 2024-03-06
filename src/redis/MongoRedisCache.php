@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace BestOnion\MongoOrm\redis;
+namespace fairwic\MongoOrm\redis;
 
 use Hyperf\Context\ApplicationContext;
 use Hyperf\Di\Annotation\Inject;
