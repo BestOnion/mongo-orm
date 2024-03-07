@@ -38,7 +38,6 @@ class MongoCollection implements IteratorAggregate, \ArrayAccess, \JsonSerializa
 
     public function __get(string $name)
     {
-        var_dump(77777777);
         // 检查属性是否存在
         if (array_key_exists($name, $this->items)) {
             return $this->items[$name];
@@ -48,17 +47,13 @@ class MongoCollection implements IteratorAggregate, \ArrayAccess, \JsonSerializa
 
     public function __set(string $name, $value)
     {
-        var_dump('set name', $name);
-        var_dump('set name', $value);
         if (!array_key_exists($name, $this->items)) {
             $this->items[$name] = $value;
         }
-        var_dump('set success');
     }
 
     public function toArray(): array
     {
-        var_dump(333333333333333);
         return $this->items;
     }
 

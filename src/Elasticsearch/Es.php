@@ -90,7 +90,9 @@ class Es
 
     /**
      * 新建/替换文档
-     **/
+     *
+     * @throws \Exception
+     */
     public function indexEs($params): bool
     {
         extract($params);
@@ -101,14 +103,9 @@ class Es
         ];
         $result = $this->es_client->index($index_data);
         if (!$result) {
-            Log::error("Es index error", $result);
-            return false;
+            throw new \Exception('Es index error result is null');
         } elseif (isset($result['errors']) && !$result['errors']) {
-            Log::error("Es index error", $result);
-            return true;
-        } else if (isset($result['result']) && $result['result'] == 'noop' || $result['result'] == 'created' || $result['result'] == 'updated') {
-            Log::error("Es index result", $result);
-            return true;
+            throw new \Exception('Es index error');
         }
         return true;
     }
@@ -117,16 +114,14 @@ class Es
      * 批量更新
      * @param $params
      * @return bool
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
+     * @throws \Exception
      */
     public function updateMany($params): bool
     {
         //执行bulk操作
         $result = $this->es_client->bulk($params);
         if (!$result) {
-            Log::error("Es update error", $result);
-            return false;
+            throw new \Exception('Es update error,result is null');
         } elseif (!$result['errors']) {
             return true;
         }
@@ -159,32 +154,10 @@ class Es
     public function searchEs($es_params)
     {
         extract($es_params);
-//        if (!isset($field_alias)) {
-//            $field_alias = [];
-//        }
-//        $offset = $data['offset'] ?? 0;
-//        $limit = $data['limit'] ?? 50;
-//        $order_field = $data['order_field'] ?? 'id';
-//        $order_type = $data['order_type'] ?? 'desc';
-//        if (!in_array($order_type, ['asc', 'desc'])) {
-//            $order_type = 'desc';
-//        }
-//        //初始化查询body
-//        $body = ['from' => $offset, 'size' => $limit, 'sort' => [$order_field => $order_type]];
-//        //获取bool查询条件
-//        $bool = $this->_getQueryInfo($data, $condition, $field_alias);
-//        if (!empty($bool)) {
-//            $body['query'] = ['bool' => $bool];
-//        }
-//        $source_field = $data['source_field'] ?? '';
-//        if (!empty($source_field)) {
-//            $body['_source'] = explode(',', $source_field);
-//        }
         $params = [
             'index' => $index,
             'body' => $body,
         ];
-        var_dump($params);
         return $this->es_client->search($params);
     }
 

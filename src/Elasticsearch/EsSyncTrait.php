@@ -60,7 +60,6 @@ trait EsSyncTrait
      */
     public function syncBatch(array $data): bool
     {
-        var_dump(333333);
         if ($this instanceof EsInstanceInterface) {
             $es = $this->getEsInstance();
             // 循环插入100条数据

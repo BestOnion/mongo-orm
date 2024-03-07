@@ -36,7 +36,7 @@ trait MongoRedisCache
         $keys = array_map(fn($id) => $this->getRedisKey($id), $ids);
         $arr = $this->getRedis()->mGet($keys);
         if ($arr && $arr[0]) {
-            var_dump('get from redis');
+//            var_dump('get from redis');
             if (!$fields) {
                 return array_map(fn($item) => json_decode($item, true), $arr);
             } else {
@@ -46,7 +46,7 @@ trait MongoRedisCache
 
         //开启管道
         $this->getRedis()->multi(\Redis::PIPELINE);
-        var_dump('get from db');
+//        var_dump('get from db');
         $arr = $this->whereIn('id', $ids)->get();
         $redisArr = [];
         $result = [];
@@ -99,7 +99,7 @@ trait MongoRedisCache
                 return array_intersect_key(json_decode($arr, true), array_flip($fields));
             }
         }
-        var_dump('get from db');
+//        var_dump('get from db');
         //开启管道
         $arr = $this->findById($id);
         if ($arr) {
