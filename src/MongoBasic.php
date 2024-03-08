@@ -244,7 +244,7 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
         if (isset($this->useCache) && $this->useCache) {
             $info = $this->getCollection()->findOne($this->filter, $this->option);
         }
-        $result = $this->getCollection()->updateOne($this->filter, ['$set' => $data]);
+        $result = $this->getCollection()->updateMany($this->filter, ['$set' => $data]);
         $count = $result->getModifiedCount();
         if ($count) {
             if (isset($this->useCache) && $this->useCache && isset($info)) {
