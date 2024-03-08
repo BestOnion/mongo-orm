@@ -206,6 +206,18 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
     }
 
     /**
+     * @param string|array $field
+     * @param array $array
+     * @return $this
+     */
+    public function whereBetween(string|array $field, array $array): static
+    {
+        $where[$field] = [ '$gte' =>$array[0], '$lte' =>$array[1]];
+        $this->filter = array_merge($this->filter, $where);
+        return $this;
+    }
+
+    /**
      * @param array $data
      * @return int
      * @throws \RedisException
