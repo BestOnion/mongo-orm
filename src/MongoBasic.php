@@ -52,7 +52,6 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
     private array $columns = [];
     private array $option = [];
     private array $filter = [];
-    private int $limit = 100;
     private array $collections;
     private array $pipleline = [];
     private array $opter_map = [
@@ -101,9 +100,10 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
             if ($this->isSoftDelete) {
                 $this->where('deleted_at', null);
             }
-            $this->option['limit'] = $this->limit;
             $result = $this->getCollection()->find($this->filter, $this->option);
         }
+
+
         return $result;
     }
 
@@ -121,9 +121,18 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
     /**
      * @return $this
      */
+    public function skip(int $skip = 0): static
+    {
+        $this->option['skip'] = min($skip, 1000);
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
     public function limit(int $limit = 10): static
     {
-        $this->limit = min($limit, 1000);
+        $this->option['limit'] = min($limit, 1000);
         return $this;
     }
 
@@ -212,7 +221,7 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
      */
     public function whereBetween(string|array $field, array $array): static
     {
-        $where[$field] = [ '$gte' =>$array[0], '$lte' =>$array[1]];
+        $where[$field] = ['$gte' => $array[0], '$lte' => $array[1]];
         $this->filter = array_merge($this->filter, $where);
         return $this;
     }
@@ -434,9 +443,6 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
         $pipeline[] = [
             '$replaceRoot' => ['newRoot' => '$document'] // 将 document 字段提升为根文档
         ];
-        if ($this->limit) {
-            $pipeline[] = ['$limit' => $this->limit];
-        }
         $this->pipleline = $pipeline;
         return $this;
     }
