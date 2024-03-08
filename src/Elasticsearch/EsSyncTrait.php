@@ -53,12 +53,10 @@ trait EsSyncTrait
 
     /**
      * Sync data to Elasticsearch
-     *
-     * @param array $data
      * @return bool
      * @throws \Exception
      */
-    public function syncBatch(array $data): bool
+    public function syncBatch($data): bool
     {
         if ($this instanceof EsInstanceInterface) {
             $es = $this->getEsInstance();
