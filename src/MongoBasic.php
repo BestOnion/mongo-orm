@@ -517,15 +517,22 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
         return $data1;
     }
 
-
     /**
      * @return int
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function count(): int
     {
-        $result = $this->get();
-        return count($result);
+        if ($this->isSoftDelete) {
+            $this->filter['deleted_at'] = null;
+        }
+        foreach ($this->columns as $value) {
+            $this->option['projection'][$value] = 1;
+        }
+        return $this->getCollection()->countDocuments($this->filter, $this->option);
     }
+
 
     /**
      * @param $filter

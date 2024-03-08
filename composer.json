@@ -18,6 +18,7 @@
     "hyperf/gotask": "v3.0.1",
     "hyperf/redis": "~3.0.0",
     "hyperf/elasticsearch": "^3.0",
-    "ext-mongodb": "*"
+    "ext-mongodb": "*",
+    "ext-redis": "*"
   }
 }
