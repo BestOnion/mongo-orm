@@ -13,6 +13,7 @@ class MongoCollection implements IteratorAggregate, \ArrayAccess, \JsonSerializa
     {
 
     }
+
     public function items()
     {
         return $this->items;
@@ -54,6 +55,10 @@ class MongoCollection implements IteratorAggregate, \ArrayAccess, \JsonSerializa
 
     public function toArray(): array
     {
+        foreach ($this->items as $key => $value) {
+            /** @var $value MongoModel */
+            $this->items[$key] = $value->getAtrributes();
+        }
         return $this->items;
     }
 
