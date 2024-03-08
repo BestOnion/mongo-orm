@@ -1,10 +1,21 @@
 <?php
 
 namespace fairwic\MongoOrm;
-class DocumentArr implements \ArrayAccess
+
+use ArrayIterator;
+use Iterator;
+use IteratorAggregate;
+use Traversable;
+
+class DocumentArr implements \ArrayAccess, Iterator
 {
     protected array $attributes = [];
     protected array $relations = [];
+
+    public function getAtrributes()
+    {
+        return $this->attributes;
+    }
 
     /**
      * 获取不存在的属性时候
@@ -13,7 +24,7 @@ class DocumentArr implements \ArrayAccess
      */
     public function __get(string $name)
     {
-//        var_dump(__FUNCTION__);
+        //        var_dump(__FUNCTION__);
         // 检查属性是否存在
         if (array_key_exists($name, $this->attributes)) {
             return $this->attributes[$name];
@@ -35,7 +46,7 @@ class DocumentArr implements \ArrayAccess
      */
     public function __set(string $name, $value)
     {
-//        var_dump(__FUNCTION__);
+        //        var_dump(__FUNCTION__);
         if (!array_key_exists($name, $this->attributes)) {
             $this->attributes[$name] = $value;
         }
@@ -55,7 +66,7 @@ class DocumentArr implements \ArrayAccess
         }
     }
 
-    public function toArray(): array
+    public function toArray()
     {
         return $this->attributes;
     }
@@ -72,13 +83,13 @@ class DocumentArr implements \ArrayAccess
 
     public function offsetExists($offset): bool
     {
-//        var_dump(__FUNCTION__);
+        //        var_dump(__FUNCTION__);
         return isset($this->attributes[$offset]);
     }
 
     public function offsetUnset($offset): void
     {
-//        var_dump(__FUNCTION__);
+        //        var_dump(__FUNCTION__);
         unset($this->attributes[$offset]);
     }
 
@@ -92,5 +103,37 @@ class DocumentArr implements \ArrayAccess
             }
         }
         return null;
+    }
+
+    public function getIterator()
+    {
+        // TODO: Implement getIterator() method.
+        // 返回一个 ArrayIterator，使得 foreach 能够遍历 $this->items 数组
+        return new ArrayIterator($this->attributes);
+    }
+
+    public function current(): mixed
+    {
+        // TODO: Implement current() method.
+    }
+
+    public function next(): void
+    {
+        // TODO: Implement next() method.
+    }
+
+    public function key(): mixed
+    {
+        // TODO: Implement key() method.
+    }
+
+    public function valid(): bool
+    {
+        // TODO: Implement valid() method.
+    }
+
+    public function rewind(): void
+    {
+        // TODO: Implement rewind() method.
     }
 }
