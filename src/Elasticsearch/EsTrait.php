@@ -6,6 +6,18 @@ trait EsTrait
 {
     use EsSyncTrait;
 
+    protected bool $isUsedEs = true;
+
+    /**
+     * @param array $ids
+     * @return bool
+     * @throws \Exception
+     */
+    function delete_es(array $ids): bool
+    {
+        return $this->deleteBatch($ids);
+    }
+
     /**
      * @param $id
      * @return bool

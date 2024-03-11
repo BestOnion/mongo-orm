@@ -2,10 +2,9 @@
 
 namespace fairwic\MongoOrm;
 
+use Exception;
 use fairwic\MongoOrm\Elasticsearch\EsTrait;
 use fairwic\MongoOrm\redis\MongoRedisCache;
-use fairwic\MongoOrm\MongoCollection;
-use Exception;
 use Hyperf\Context\ApplicationContext;
 use Hyperf\GoTask\MongoClient\Collection;
 use Hyperf\GoTask\MongoClient\MongoClient;
@@ -48,7 +47,7 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
     protected string $primaryKey = 'id';
     protected string $database_name;
     protected string $document_name;
-    private bool $isSoftDelete = false;
+    protected bool $isSoftDelete = false;
     private array $columns = [];
     private array $option = [];
     private array $filter = [];
@@ -242,14 +241,24 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
         $data['updated_at'] = time();
         //判断是否要有redis缓存
         if (isset($this->useCache) && $this->useCache) {
-            $info = $this->getCollection()->findOne($this->filter, $this->option);
+            $infos = $this->get();
         }
         $result = $this->getCollection()->updateMany($this->filter, ['$set' => $data]);
         $count = $result->getModifiedCount();
         if ($count) {
-            if (isset($this->useCache) && $this->useCache && isset($info)) {
-                $this->redis_delete((string)($info['_id']));
+            if (isset($infos)) {
+                $argv = [];
+                foreach ($infos as $info) {
+                    $argv[] = (string)$info['id'];
+                }
+                if (isset($this->useCache) && $this->useCache) {
+                    $this->batchDelete($argv);
+                }
+                if (isset($this->isUsedEs) && $this->isUsedEs) {
+                    $this->searchableMany($argv);
+                }
             }
+
         }
         return $count;
     }
@@ -261,26 +270,36 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
      */
     public function delete(bool $forceDelete = false): int
     {
-        $filter = $this->filter;
+
         if (!$forceDelete && $this->isSoftDelete) {
-            if (!$filter) {
+            if (!$this->filter) {
                 throw  new \Exception('mongo filter is not empty in update');
             }
             $data['deleted_at'] = time();
             //判断是否要有redis缓存
             if (isset($this->useCache) && $this->useCache) {
-                $infos = $this->getCollection()->find($this->filter, $this->option);
+                $infos = $this->get();
             }
-            $result = $this->getCollection()->updateMany($filter, ['$set' => $data]);
-            $count = $result->getModifiedCount();
+            $count = $this->updateMany($this->filter, $data);
             if ($count) {
-                if (isset($this->useCache) && $this->useCache && isset($infos)) {
-                    $this->redis_delete((string)($infos['_id']));
+                if (isset($infos)) {
+                    $argv = [];
+                    foreach ($infos as $info) {
+                        $argv[] = (string)$info['id'];
+                    }
+                    if (isset($this->useCache) && $this->useCache) {
+                        $this->batchDelete($argv);
+                    }
+                    if (isset($this->isUsedEs) && $this->isUsedEs) {
+                        //删除es中的数据
+                        $this->delete_es($argv);
+                    }
                 }
+
                 return $count;
             }
         } else {
-            $result = $this->getCollection()->deleteMany($filter);
+            $result = $this->getCollection()->deleteMany($this->filter);
             return $result->getDeletedCount();
         }
     }

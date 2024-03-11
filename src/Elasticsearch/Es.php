@@ -116,7 +116,7 @@ class Es
      * @return bool
      * @throws \Exception
      */
-    public function updateMany($params): bool
+    public function bulk($params): bool
     {
         //执行bulk操作
         $result = $this->es_client->bulk($params);
