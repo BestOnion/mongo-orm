@@ -15,7 +15,7 @@ trait EsTrait
     {
         //get data from mongo
         if (empty($data)) {
-            $data = $this->findById($id, $this->getEsFields());
+            $data = $this->findById($id, $this->getEsFields())->toArray();
         }
         //sync data to es
         return $this->syncOneToEs($id, $data);

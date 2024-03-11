@@ -33,11 +33,11 @@ trait EsSyncTrait
      * Sync data to Elasticsearch
      *
      * @param string $id
-     * @param array $data
+     * @param  $data
      * @return bool
      * @throws \Exception
      */
-    public function syncOneToEs(string $id, array $data): bool
+    public function syncOneToEs(string $id, mixed $data): bool
     {
         if ($this instanceof EsInstanceInterface) {
             $es = $this->getEsInstance();
