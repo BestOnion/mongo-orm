@@ -83,14 +83,20 @@ class DocumentArr implements \ArrayAccess, Iterator
 
     public function offsetExists($offset): bool
     {
-        //        var_dump(__FUNCTION__);
-        return isset($this->attributes[$offset]);
+        if (isset($this->attributes[$offset])) {
+            return true;
+        } else {
+            return isset($this->relations[$offset]);
+        }
     }
 
     public function offsetUnset($offset): void
     {
-        //        var_dump(__FUNCTION__);
-        unset($this->attributes[$offset]);
+        if (isset($this->attributes)) {
+            unset($this->attributes[$offset]);
+        } else {
+            unset($this->relations[$offset]);
+        }
     }
 
     public function offsetGet($offset): mixed
