@@ -547,7 +547,7 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
      * @param $withKey
      * @return array
      */
-    public function hasOne(mixed $data1, mixed $data2, $withKey): array
+    public function hasOne(mixed $data1, mixed $data2, $withKey)
     {
         $data1[$withKey] = $data2;
         return $data1;
