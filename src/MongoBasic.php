@@ -569,7 +569,7 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
          * @var array|MongoBasic $value
          */
         foreach ($data1 as $key => $value) {
-            $value->addRelation([$withKey => []]);
+            $value->addRelation([$withKey => null]);
             foreach ($data2 as $v) {
                 if ($value[$filed1] == $v[$filed2]) {
                     $value->addRelation([$withKey => $v]);
