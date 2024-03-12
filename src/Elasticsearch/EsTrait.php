@@ -2,10 +2,10 @@
 
 namespace fairwic\MongoOrm\Elasticsearch;
 
+
 trait EsTrait
 {
     use EsSyncTrait;
-
     protected bool $isUsedEs = true;
 
     /**
@@ -18,20 +18,7 @@ trait EsTrait
         return $this->deleteBatch($ids);
     }
 
-    /**
-     * @param $id
-     * @return bool
-     * @throws \Exception
-     */
-    function searchable($id, $data = []): bool
-    {
-        //get data from mongo
-        if (empty($data)) {
-            $data = $this->findById($id, $this->getEsFields())->toArray();
-        }
-        //sync data to es
-        return $this->syncOneToEs($id, $data);
-    }
+
 
     /**
      * @param $ids

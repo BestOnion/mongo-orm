@@ -2,12 +2,14 @@
 
 namespace fairwic\MongoOrm;
 
+use App\Controller\Statistics\Statistics;
 use Exception;
 use fairwic\MongoOrm\Elasticsearch\EsTrait;
 use fairwic\MongoOrm\redis\MongoRedisCache;
 use Hyperf\Context\ApplicationContext;
 use Hyperf\GoTask\MongoClient\Collection;
 use Hyperf\GoTask\MongoClient\MongoClient;
+use MongoDB\BSON\ObjectId;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
@@ -15,6 +17,14 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
 {
     use EsTrait;
     use MongoRedisCache;
+
+    /** @var bool 是否自动维护时间戳,默认true */
+    public bool $auto_timestamps = true;
+
+    const CREATED_AT = 'created_at';
+
+    const UPDATED_AT = 'created_at';
+
 
     /**
      * @return array
@@ -238,7 +248,9 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
         if (!$this->filter) {
             return 0;
         }
-        $data['updated_at'] = time();
+        if ($this->auto_timestamps) {
+            $data['updated_at'] = time();
+        }
         //判断是否要有redis缓存
         if (isset($this->useCache) && $this->useCache) {
             $infos = $this->get();
@@ -252,7 +264,7 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
                     $argv[] = (string)$info['id'];
                 }
                 if (isset($this->useCache) && $this->useCache) {
-                    $this->batchDelete($argv);
+                    $this->batchDeleteRedisKey($argv);
                 }
                 if (isset($this->isUsedEs) && $this->isUsedEs) {
                     $this->searchableMany($argv);
@@ -264,13 +276,57 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
     }
 
     /**
+     * 同步单挑数据到es
+     * @return int
+     * @throws Exception
+     */
+    public function searchableOne(): int
+    {
+        $item = $this->first();
+        // 检查对象中是否存在 'sampleMethod' 方法
+        if (method_exists($this, 'toSearchableArray')) {
+            $data = $item->toSearchableArray();
+        } else {
+            $data = $item->getAtrributes();
+        }
+        $result = $this->syncOneToEs($item->id, $data);
+
+        return $result;
+    }
+
+    /**
+     * 同步单挑数据到es
+     * @return int
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function searchable(): int
+    {
+        $data = $this->get();
+        $count = 0;
+        /** @var self $item */
+        foreach ($data as $item) {
+            // 检查对象中是否存在 'sampleMethod' 方法
+            if (method_exists($this, 'toSearchableArray')) {
+                $data = $item->toSearchableArray();
+            } else {
+                $data = $item->getAtrributes();
+            }
+            $result = $this->syncOneToEs($item->id, $data);
+            if ($result) {
+                $count++;
+            }
+        }
+        return $count;
+    }
+
+    /**
      * @param bool $forceDelete
      * @return int
      * @throws Exception
      */
     public function delete(bool $forceDelete = false): int
     {
-
         if (!$forceDelete && $this->isSoftDelete) {
             if (!$this->filter) {
                 throw  new \Exception('mongo filter is not empty in update');
@@ -288,20 +344,20 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
                         $argv[] = (string)$info['id'];
                     }
                     if (isset($this->useCache) && $this->useCache) {
-                        $this->batchDelete($argv);
+                        $this->batchDeleteRedisKey($argv);
                     }
                     if (isset($this->isUsedEs) && $this->isUsedEs) {
                         //删除es中的数据
                         $this->delete_es($argv);
                     }
                 }
-
                 return $count;
             }
         } else {
             $result = $this->getCollection()->deleteMany($this->filter);
             return $result->getDeletedCount();
         }
+        return 1;
     }
 
     public function updateMany(array $filter, array $data): int
@@ -320,7 +376,7 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
     {
         $count = $this->where('id', $id)->update($data);
         if ($count > 0) {
-            $this->searchable($id);
+            $this->where('id', $id)->searchable();
         }
         return $count;
     }
@@ -361,6 +417,8 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
     /**
      * @param string $field
      * @return mixed|null
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function value(string $field): mixed
     {
@@ -394,11 +452,6 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
         }
         return $result;
     }
-
-    //    public function toArray()
-    //    {
-    //
-    //    }
 
     /**
      * @param $data
@@ -478,6 +531,8 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
 
     /**
      * @return MongoCollection
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function get(): MongoCollection
     {
@@ -602,7 +657,7 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
      */
     public function getDocument(mixed $data): MongoBasic
     {
-        $doc = new self();
+        $doc = new static();
         $arr = [];
         foreach ($data as $key => $value) {
             if ($key == '_id') {
@@ -614,5 +669,28 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
         }
         $doc->attributes = $arr;
         return $doc;
+    }
+
+    /**
+     * @param array $data
+     * @return string
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function save(array $data): string
+    {
+        if (!$data) {
+            $data = $this->attributes;
+        }
+        if ($this->auto_timestamps) {
+            $data['created_at'] = time();
+            $data['updated_at'] = time();
+        }
+        $insertId = $this->getCollection()->insertOne($data)->getInsertedId();
+        if ($insertId && $this->isUsedEs) {
+            //如果使用了es则同步到es
+            $this->where('id', $insertId->__toString())->searchable();
+        }
+        return $insertId->__toString();
     }
 }

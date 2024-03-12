@@ -7,8 +7,29 @@ trait EsSyncTrait
     /**
      * Sync data to Elasticsearch
      *
-     *
-     * /**
+     * @param array $data
+     * @return
+     * @throws \Exception
+     */
+    public function search(array $data)
+    {
+        if ($this instanceof EsInstanceInterface) {
+            $es = $this->getEsInstance();
+            $index_data = [
+                'index' => $this->index_name,
+                'body' => $data,
+            ];
+            $data = $es->searchEs($index_data);
+            $array = [];
+            if ($data['hits']['total']['value'] > 0) {
+                $array = $data['hits']['hits'];
+            }
+            return $array;
+        }
+        throw new \Exception('EsInstanceInterface not implemented');
+    }
+
+    /**
      * Sync data to Elasticsearch
      *
      * @param string $id

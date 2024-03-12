@@ -137,7 +137,7 @@ trait MongoRedisCache
      * @return false|int|\Redis
      * @throws \RedisException
      */
-    protected function batchDelete(array $k): bool|int|\Redis
+    protected function batchDeleteRedisKey(array $k): bool|int|\Redis
     {
         $keys = [];
         foreach ($k as $val) {
