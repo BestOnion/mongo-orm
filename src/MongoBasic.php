@@ -677,7 +677,7 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public function save(array $data): string
+    public function save(array $data = []): string
     {
         if (!$data) {
             $data = $this->attributes;
