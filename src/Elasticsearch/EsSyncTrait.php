@@ -37,7 +37,7 @@ trait EsSyncTrait
      * @return bool
      * @throws \Exception
      */
-    public function syncOneToEs(string $id, mixed $data): bool
+    public function searchable_one(string $id, mixed $data): bool
     {
         if ($this instanceof EsInstanceInterface) {
             $es = $this->getEsInstance();

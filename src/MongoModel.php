@@ -12,4 +12,14 @@ class MongoModel extends MongoBasic
     protected string $document_name;
     //is soft delete
     protected bool $isSoftDelete = false;
+
+    public function createIndex(array $index_name)
+    {
+        return $this->getCollection()->createIndexes($index_name);
+    }
+
+    public function listIndexs()
+    {
+        return $this->getCollection()->listIndexes('im_group');
+    }
 }

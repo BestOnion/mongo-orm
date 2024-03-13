@@ -25,6 +25,8 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
 
     const UPDATED_AT = 'created_at';
 
+    protected ?string $dateFormat = 'U';
+
 
     /**
      * @return array
@@ -289,7 +291,7 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
         } else {
             $data = $item->getAtrributes();
         }
-        $result = $this->syncOneToEs($item->id, $data);
+        $result = $this->searchable_one($item->id, $data);
 
         return $result;
     }
@@ -312,7 +314,7 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
             } else {
                 $data = $item->getAtrributes();
             }
-            $result = $this->syncOneToEs($item->id, $data);
+            $result = $this->searchable_one($item->id, $data);
             if ($result) {
                 $count++;
             }
@@ -663,6 +665,17 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
             if ($key == '_id') {
                 $tempkey = $this->primaryKey;
                 $arr[$tempkey] = (string)$value;
+            }
+            if ($key == self::CREATED_AT || $key == self::UPDATED_AT) {
+                if ($this->dateFormat == 'U') {
+                    try {
+                        $arr[$key] = date('Y-m-d H:i:s', $value);
+                    } catch (Exception $e) {
+                        $arr[$key] = $value;
+                    }
+                } else {
+                    $arr[$key] = $value;
+                }
             } else {
                 $arr[$key] = $value;
             }
