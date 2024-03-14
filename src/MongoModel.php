@@ -15,7 +15,7 @@ class MongoModel extends MongoBasic
 
     public function createIndex(array $index_name)
     {
-        return $this->getCollection()->createIndexes($index_name);
+        return $this->getCollection()->createIndex($index_name);
     }
 
     public function listIndexs()
