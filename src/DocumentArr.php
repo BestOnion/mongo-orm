@@ -17,6 +17,11 @@ class DocumentArr implements \ArrayAccess, Iterator
         return $this->attributes;
     }
 
+    public function getRelations()
+    {
+        return $this->relations;
+    }
+
     /**
      * 获取不存在的属性时候
      * @param string $name
