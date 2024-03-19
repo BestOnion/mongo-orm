@@ -23,11 +23,17 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
 
     const CREATED_AT = 'created_at';
 
-    const UPDATED_AT = 'created_at';
+    const UPDATED_AT = 'updated_at';
 
     protected ?string $dateFormat = 'U';
 
 
+//    private QueryBuilder $queryBuilder;
+//
+//    public function __construct()
+//    {
+//        $this->queryBuilder = new QueryBuilder();
+//    }
     /**
      * @return array
      */
@@ -662,10 +668,12 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
         $doc = new static();
         $arr = [];
         foreach ($data as $key => $value) {
+            //处理主键
             if ($key == '_id') {
                 $tempkey = $this->primaryKey;
                 $arr[$tempkey] = (string)$value;
             }
+            //处理返回时间格式
             if ($key == self::CREATED_AT || $key == self::UPDATED_AT) {
                 if ($this->dateFormat == 'U') {
                     try {

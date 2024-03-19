@@ -43,7 +43,6 @@ class MongoCollection implements IteratorAggregate, \ArrayAccess, \JsonSerializa
         if (array_key_exists($name, $this->items)) {
             return $this->items[$name];
         }
-        // TODO: Implement __get() method.
     }
 
     public function __set(string $name, $value)
@@ -97,6 +96,5 @@ class MongoCollection implements IteratorAggregate, \ArrayAccess, \JsonSerializa
     public function jsonSerialize(): array
     {
         return $this->items;
-        // TODO: Implement jsonSerialize() method.
     }
 }

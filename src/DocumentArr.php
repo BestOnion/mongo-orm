@@ -7,7 +7,7 @@ use Iterator;
 use IteratorAggregate;
 use Traversable;
 
-class DocumentArr implements \ArrayAccess, Iterator
+class DocumentArr implements \ArrayAccess
 {
     protected array $attributes = [];
     protected array $relations = [];
@@ -116,35 +116,5 @@ class DocumentArr implements \ArrayAccess, Iterator
         return null;
     }
 
-    public function getIterator()
-    {
-        // TODO: Implement getIterator() method.
-        // 返回一个 ArrayIterator，使得 foreach 能够遍历 $this->items 数组
-        return new ArrayIterator($this->attributes);
-    }
 
-    public function current(): mixed
-    {
-        // TODO: Implement current() method.
-    }
-
-    public function next(): void
-    {
-        // TODO: Implement next() method.
-    }
-
-    public function key(): mixed
-    {
-        // TODO: Implement key() method.
-    }
-
-    public function valid(): bool
-    {
-        // TODO: Implement valid() method.
-    }
-
-    public function rewind(): void
-    {
-        // TODO: Implement rewind() method.
-    }
 }

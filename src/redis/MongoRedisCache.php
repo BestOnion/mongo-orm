@@ -72,6 +72,7 @@ trait MongoRedisCache
     public function patchAttribute(array $data)
     {
         $class = new (static::class);
+
         foreach ($data as $key => $value) {
             $class->$key = $value;
         }
@@ -87,29 +88,32 @@ trait MongoRedisCache
     public function findFromCache(string $id, $fields = [])
     {
         $keys = $this->getRedisKey($id);
-        $arr = $this->getRedis()->get($keys);
+        $arr = $this->getRedis()->hGetAll($keys);
         //$arr=array('a'=>'b','c'=>'d');
-        if ($arr && $arr[0]) {
+        if ($arr) {
             if (!$fields) {
-                $data = json_decode($arr, true);
                 //转换成对象
-                $obj = $this->patchAttribute($data);
+                $obj = $this->patchAttribute($arr);
                 return $obj;
             } else {
-                return array_intersect_key(json_decode($arr, true), array_flip($fields));
+                return array_intersect_key($arr, array_flip($fields));
             }
-        }
-        //        var_dump('get from db');
-        //开启管道
-        $arr = $this->findById($id);
-        if ($arr) {
-            $key = $this->getRedisKey($id);
-            if ($fields) {
-                $arr = array_intersect_key($arr, array_flip($fields));
+        } else {
+            //var_dump('get from db');
+            //开启管道
+            $arr = $this->findById($id);
+            if ($arr) {
+                $key = $this->getRedisKey($id);
+                if ($fields) {
+                    $arr = array_intersect_key($arr, array_flip($fields));
+                }
+                foreach ($arr->toArray() as $has_key => $value) {
+                    $this->getRedis()->hset($key, $has_key, $value);
+                }
             }
-            $this->getRedis()->set($key, json_encode($arr), $this->expire);
+            return $arr;
         }
-        return $arr;
+
     }
 
     /**
