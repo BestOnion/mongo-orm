@@ -677,8 +677,10 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
                 if ($key == self::CREATED_AT || $key == self::UPDATED_AT) {
                     if ($this->dateFormat == 'U') {
                         try {
-                            $arr[$key] = date('Y-m-d H:i:s', $value);
-                        } catch (Exception $e) {
+                            if (gettype($value) == 'integer') {
+                                $arr[$key] = date('Y-m-d H:i:s', $value);
+                            }
+                        } catch (\Throwable $e) {
                             $arr[$key] = $value;
                         }
                     } else {

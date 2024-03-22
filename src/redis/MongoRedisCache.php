@@ -47,6 +47,7 @@ trait MongoRedisCache
                 foreach ($arr as $key => $hmvalues) {
                     $arr[$key] = $this->changeObj($hmvalues);
                 }
+                return $arr;
             } else {
                 $resArr = array_map(fn($item) => array_intersect_key($item, array_flip($fields)), $arr);
                 return array_map(fn($item) => ($this->changeObj($resArr)), $arr);
