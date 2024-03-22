@@ -85,7 +85,7 @@ trait MongoRedisCache
      * @throws \Psr\Container\NotFoundExceptionInterface
      * @throws \RedisException
      */
-    public function findFromCache(string $id, $fields = [])
+    public function findOneFromCache(string $id, $fields = [])
     {
         $keys = $this->getRedisKey($id);
         $arr = $this->getRedis()->hGetAll($keys);
