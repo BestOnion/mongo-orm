@@ -28,12 +28,12 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
     protected ?string $dateFormat = 'U';
 
 
-//    private QueryBuilder $queryBuilder;
-//
-//    public function __construct()
-//    {
-//        $this->queryBuilder = new QueryBuilder();
-//    }
+    //    private QueryBuilder $queryBuilder;
+    //
+    //    public function __construct()
+    //    {
+    //        $this->queryBuilder = new QueryBuilder();
+    //    }
     /**
      * @return array
      */
@@ -462,11 +462,11 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
     }
 
     /**
-     * @param $data
+     * @param array $data
      * @return DocumentArr
      */
 
-    public function changeObj($data)
+    public function changeObj(array $data): DocumentArr
     {
         $model = $this->getDocument($data);
         return $model;
@@ -672,20 +672,21 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
             if ($key == '_id') {
                 $tempkey = $this->primaryKey;
                 $arr[$tempkey] = (string)$value;
-            }
-            //处理返回时间格式
-            if ($key == self::CREATED_AT || $key == self::UPDATED_AT) {
-                if ($this->dateFormat == 'U') {
-                    try {
-                        $arr[$key] = date('Y-m-d H:i:s', $value);
-                    } catch (Exception $e) {
+            } else {
+                //处理返回时间格式
+                if ($key == self::CREATED_AT || $key == self::UPDATED_AT) {
+                    if ($this->dateFormat == 'U') {
+                        try {
+                            $arr[$key] = date('Y-m-d H:i:s', $value);
+                        } catch (Exception $e) {
+                            $arr[$key] = $value;
+                        }
+                    } else {
                         $arr[$key] = $value;
                     }
                 } else {
                     $arr[$key] = $value;
                 }
-            } else {
-                $arr[$key] = $value;
             }
         }
         $doc->attributes = $arr;

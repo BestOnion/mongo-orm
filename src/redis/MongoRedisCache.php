@@ -34,13 +34,22 @@ trait MongoRedisCache
     protected function findManyFromCache(array $ids, $fields = [])
     {
         $keys = array_map(fn($id) => $this->getRedisKey($id), $ids);
-        $arr = $this->getRedis()->mGet($keys);
+        //开启管道
+        $this->getRedis()->multi(\Redis::PIPELINE);
+        foreach ($keys as $key) {
+            $this->getRedis()->hGetAll($key);
+        }
+        //执行
+        $arr = $this->getRedis()->exec();
         if ($arr && $arr[0]) {
             //var_dump('get from redis');
             if (!$fields) {
-                return array_map(fn($item) => json_decode($item, true), $arr);
+                foreach ($arr as $key => $hmvalues) {
+                    $arr[$key] = $this->changeObj($hmvalues);
+                }
             } else {
-                return array_map(fn($item) => array_intersect_key(json_decode($item, true), array_flip($fields)), $arr);
+                $resArr = array_map(fn($item) => array_intersect_key($item, array_flip($fields)), $arr);
+                return array_map(fn($item) => ($this->changeObj($resArr)), $arr);
             }
         }
 
@@ -52,14 +61,14 @@ trait MongoRedisCache
         $result = [];
         foreach ($arr as &$item) {
             $key = $this->getRedisKey($item['id']);
-            $redisArr[$key] = json_encode($item);
+            $redisArr[$key] = $item->toArray();
+            $this->getRedis()->hMSet($key, $item->toArray());
             if (!$fields) {
                 $result[] = $item;
             } else {
-                $result[] = array_intersect_key($item, array_flip($fields));
+                $result[] = array_intersect_key($item->toArray(), array_flip($fields));
             }
         }
-        $this->getRedis()->mset($redisArr);
         // 使用管道为每个键设置过期时间
         foreach ($redisArr as $key => $value) {
             $this->getRedis()->expire($key, $this->expire);
@@ -93,10 +102,12 @@ trait MongoRedisCache
         if ($arr) {
             if (!$fields) {
                 //转换成对象
-                $obj = $this->patchAttribute($arr);
+                $obj = $this->changeObj($arr);
                 return $obj;
             } else {
-                return array_intersect_key($arr, array_flip($fields));
+                $arr= array_intersect_key($arr, array_flip($fields));
+                $obj = $this->changeObj($arr);
+                return $obj;
             }
         } else {
             //var_dump('get from db');
