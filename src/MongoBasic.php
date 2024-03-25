@@ -3,6 +3,7 @@
 namespace fairwic\MongoOrm;
 
 use App\Controller\Statistics\Statistics;
+use App\Utils\Log;
 use Exception;
 use fairwic\MongoOrm\Elasticsearch\EsTrait;
 use fairwic\MongoOrm\redis\MongoRedisCache;
@@ -118,6 +119,7 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
                 $this->where('deleted_at', null);
             }
             $result = $this->getCollection()->find($this->filter, $this->option);
+            Log::info('mongo-get查询返回结果', [$result, $this->filter, $this->option]);
         }
 
 
@@ -414,6 +416,7 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
         }
         $this->option['limit'] = 1;
         $result = $this->getCollection()->find($this->filter, $this->option);
+        Log::info('mongo-findbByid查询返回结果', [$result, $this->filter, $this->option]);
         if ($result) {
             $result = $result[0];
             //返回一个Document对象
@@ -452,6 +455,7 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
         //$result = $this->col->findOne($this->filter, $this->option);
         $this->option['limit'] = 1;
         $result = $this->getCollection()->find($this->filter, $this->option);
+        Log::info('mongo-first查询返回结果', [$result, $this->filter, $this->option]);
         if ($result) {
             //取第一个
             $result = $result[0];
@@ -711,6 +715,7 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
             $data['updated_at'] = time();
         }
         $insertId = $this->getCollection()->insertOne($data)->getInsertedId();
+
         if ($insertId && $this->isUsedEs) {
             //如果使用了es则同步到es
             $this->where('id', $insertId->__toString())->searchable();
