@@ -10,7 +10,7 @@ trait EsTrait
 {
     use EsSyncTrait;
 
-    protected bool $isUsedEs = true;
+    protected bool $isUsedEs = false;
 
     /**
      * @param array $ids
@@ -42,7 +42,7 @@ trait EsTrait
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    function searchable_data(array $data=[]): bool
+    function searchable_data(array $data = []): bool
     {
         //sync data to es
         return $this->syncBatch($data);

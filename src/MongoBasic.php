@@ -5,12 +5,12 @@ namespace fairwic\MongoOrm;
 use App\Controller\Statistics\Statistics;
 use App\Utils\Log;
 use Exception;
+use fairwic\MongoOrm\Elasticsearch\EsInstanceInterface;
 use fairwic\MongoOrm\Elasticsearch\EsTrait;
 use fairwic\MongoOrm\redis\MongoRedisCache;
 use Hyperf\Context\ApplicationContext;
 use Hyperf\GoTask\MongoClient\Collection;
 use Hyperf\GoTask\MongoClient\MongoClient;
-use MongoDB\BSON\ObjectId;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
@@ -276,7 +276,7 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
                 if (isset($this->useCache) && $this->useCache) {
                     $this->batchDeleteRedisKey($argv);
                 }
-                if (isset($this->isUsedEs) && $this->isUsedEs) {
+                if ($this instanceof EsInstanceInterface) {
                     $this->searchableMany($argv);
                 }
             }
@@ -356,7 +356,7 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
                     if (isset($this->useCache) && $this->useCache) {
                         $this->batchDeleteRedisKey($argv);
                     }
-                    if (isset($this->isUsedEs) && $this->isUsedEs) {
+                    if ($this instanceof EsInstanceInterface){
                         //删除es中的数据
                         $this->delete_es($argv);
                     }
@@ -716,7 +716,7 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
         }
         $insertId = $this->getCollection()->insertOne($data)->getInsertedId();
 
-        if ($insertId && $this->isUsedEs) {
+        if ($insertId && $this instanceof EsInstanceInterface) {
             //如果使用了es则同步到es
             $this->where('id', $insertId->__toString())->searchable();
         }
