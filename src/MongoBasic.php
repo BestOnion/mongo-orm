@@ -356,7 +356,7 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
                     if (isset($this->useCache) && $this->useCache) {
                         $this->batchDeleteRedisKey($argv);
                     }
-                    if ($this instanceof EsInstanceInterface){
+                    if ($this instanceof EsInstanceInterface) {
                         //删除es中的数据
                         $this->delete_es($argv);
                     }
@@ -462,7 +462,7 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
             //返回一个Document对象
             $result = $this->changeObj($result);
         }
-        return $result;
+        return $result ?: null;
     }
 
     /**
@@ -546,7 +546,7 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public function get(): MongoCollection
+    public function get()
     {
         $result = $this->getArr();
         return $this->toObject($result);
