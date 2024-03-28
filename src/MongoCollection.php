@@ -54,20 +54,21 @@ class MongoCollection implements IteratorAggregate, \ArrayAccess, \JsonSerializa
 
     public function toArray(): array
     {
+        $arr = [];
         foreach ($this->items as $key => $value) {
             /** @var $value MongoModel */
-            $this->items[$key] = $value->getAtrributes();
+            $arr[$key] = $value->getAtrributes();
             if ($value->getRelations()) {
                 foreach ($value->getRelations() as $k => $v) {
                     if (!$v || gettype($v) == 'array') {
-                        $this->items[$key][$k] = $v;
+                        $arr[$key][$k] = $v;
                     } else if (gettype($v) == 'object') {
-                        $this->items[$key][$k] = $v->getAtrributes();
+                        $arr[$key][$k] = $v->getAtrributes();
                     }
                 }
             }
         }
-        return $this->items;
+        return $arr;
     }
 
     public function offsetSet($offset, $value): void

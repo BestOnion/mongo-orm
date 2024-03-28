@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace fairwic\MongoOrm\redis;
 
+use fairwic\MongoOrm\MongoModel;
 use Hyperf\Context\ApplicationContext;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\Redis\Redis;
@@ -42,15 +43,19 @@ trait MongoRedisCache
         //执行
         $arr = $this->getRedis()->exec();
         if ($arr && $arr[0]) {
-//            var_dump('get from redis');
             if (!$fields) {
                 foreach ($arr as $key => $hmvalues) {
-                    $arr[$key] = $this->changeObj($hmvalues);
+                    if ($hmvalues) {
+                        $redis_res[] = $this->changeObj($hmvalues);
+                    }
                 }
-                $redis_res = $arr;
             } else {
                 $resArr = array_map(fn($item) => array_intersect_key($item, array_flip($fields)), $arr);
-                $redis_res = array_map(fn($item) => ($this->changeObj($item)), $resArr);
+                foreach ($resArr as $hmvalues) {
+                    if ($hmvalues) {
+                        $redis_res [] = $this->changeObj($hmvalues);
+                    }
+                }
             }
         }
         //是否从redis取得所有数据
@@ -61,22 +66,23 @@ trait MongoRedisCache
             $redisArr = [];
             $db_result = [];
             if ($arr->toArray()) {
-//                var_dump('get from db');
                 //开启管道
                 $this->getRedis()->multi(\Redis::PIPELINE);
-                foreach ($arr as &$item) {
+                /** @var MongoModel $item */
+                foreach ($arr as $item) {
                     $key = $this->getRedisKey($item['id']);
-                    $redisArr[$key] = $item->toArray();
+                    $redisArr[] = $key;
                     $this->getRedis()->hMSet($key, $item->toArray());
                     if (!$fields) {
                         $db_result[] = $item;
                     } else {
-                        $db_result[] = array_intersect_key($item->toArray(), array_flip($fields));
+                        $array = array_intersect_key($item->toArray(), array_flip($fields));
+                        $db_result[] = $this->patchAttribute($array);
                     }
                 }
                 // 使用管道为每个键设置过期时间
-                foreach ($redisArr as $key => $value) {
-                    $this->getRedis()->expire($key, $this->expire);
+                foreach ($redisArr as $value) {
+                    $this->getRedis()->expire($value, $this->expire);
                 }
                 // 执行管道中的所有命令
                 $this->getRedis()->exec();
