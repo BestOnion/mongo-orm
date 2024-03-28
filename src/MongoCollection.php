@@ -57,9 +57,13 @@ class MongoCollection implements IteratorAggregate, \ArrayAccess, \JsonSerializa
         foreach ($this->items as $key => $value) {
             /** @var $value MongoModel */
             $this->items[$key] = $value->getAtrributes();
-            if ($value->getRelations()){
-                foreach ($value->getRelations() as $k => $v){
-                    $this->items[$key][$k] = $v;
+            if ($value->getRelations()) {
+                foreach ($value->getRelations() as $k => $v) {
+                    if (!$v || gettype($v) == 'array') {
+                        $this->items[$key][$k] = $v;
+                    } else if (gettype($v) == 'object') {
+                        $this->items[$key][$k] = $v->getAtrributes();
+                    }
                 }
             }
         }
