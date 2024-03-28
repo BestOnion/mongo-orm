@@ -42,6 +42,7 @@ trait MongoRedisCache
         //执行
         $arr = $this->getRedis()->exec();
         if ($arr && $arr[0]) {
+//            var_dump('get from redis');
             if (!$fields) {
                 foreach ($arr as $key => $hmvalues) {
                     $arr[$key] = $this->changeObj($hmvalues);
@@ -60,6 +61,7 @@ trait MongoRedisCache
             $redisArr = [];
             $db_result = [];
             if ($arr->toArray()) {
+//                var_dump('get from db');
                 //开启管道
                 $this->getRedis()->multi(\Redis::PIPELINE);
                 foreach ($arr as &$item) {

@@ -677,6 +677,7 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
                 $tempkey = $this->primaryKey;
                 $arr[$tempkey] = (string)$value;
             } else {
+                $arr[$key] = $value;
                 //处理返回时间格式
                 if ($key == self::CREATED_AT || $key == self::UPDATED_AT) {
                     if ($this->dateFormat == 'U') {
@@ -685,13 +686,8 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
                                 $arr[$key] = date('Y-m-d H:i:s', $value);
                             }
                         } catch (\Throwable $e) {
-                            $arr[$key] = $value;
                         }
-                    } else {
-                        $arr[$key] = $value;
                     }
-                } else {
-                    $arr[$key] = $value;
                 }
             }
         }
