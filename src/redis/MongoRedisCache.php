@@ -42,41 +42,45 @@ trait MongoRedisCache
         //执行
         $arr = $this->getRedis()->exec();
         if ($arr && $arr[0]) {
-            //var_dump('get from redis');
             if (!$fields) {
                 foreach ($arr as $key => $hmvalues) {
                     $arr[$key] = $this->changeObj($hmvalues);
                 }
-                return $arr;
+                $redis_res = $arr;
             } else {
                 $resArr = array_map(fn($item) => array_intersect_key($item, array_flip($fields)), $arr);
-                return array_map(fn($item) => ($this->changeObj($resArr)), $arr);
+                $redis_res = array_map(fn($item) => ($this->changeObj($item)), $resArr);
             }
         }
-
-        //开启管道
-        $this->getRedis()->multi(\Redis::PIPELINE);
-        //        var_dump('get from db');
-        $arr = $this->whereIn('id', $ids)->get();
-        $redisArr = [];
-        $result = [];
-        foreach ($arr as &$item) {
-            $key = $this->getRedisKey($item['id']);
-            $redisArr[$key] = $item->toArray();
-            $this->getRedis()->hMSet($key, $item->toArray());
-            if (!$fields) {
-                $result[] = $item;
-            } else {
-                $result[] = array_intersect_key($item->toArray(), array_flip($fields));
+        //是否从redis取得所有数据
+        if (isset($redis_res) && count($redis_res) == count($ids)) {
+            return $redis_res;
+        } else {
+            $arr = $this->whereIn('id', $ids)->get();
+            $redisArr = [];
+            $db_result = [];
+            if ($arr->toArray()) {
+                //开启管道
+                $this->getRedis()->multi(\Redis::PIPELINE);
+                foreach ($arr as &$item) {
+                    $key = $this->getRedisKey($item['id']);
+                    $redisArr[$key] = $item->toArray();
+                    $this->getRedis()->hMSet($key, $item->toArray());
+                    if (!$fields) {
+                        $db_result[] = $item;
+                    } else {
+                        $db_result[] = array_intersect_key($item->toArray(), array_flip($fields));
+                    }
+                }
+                // 使用管道为每个键设置过期时间
+                foreach ($redisArr as $key => $value) {
+                    $this->getRedis()->expire($key, $this->expire);
+                }
+                // 执行管道中的所有命令
+                $this->getRedis()->exec();
             }
+            return $db_result;
         }
-        // 使用管道为每个键设置过期时间
-        foreach ($redisArr as $key => $value) {
-            $this->getRedis()->expire($key, $this->expire);
-        }
-        // 执行管道中的所有命令
-        $this->getRedis()->exec();
-        return $result;
     }
 
     public function patchAttribute(array $data)
@@ -106,7 +110,7 @@ trait MongoRedisCache
                 $obj = $this->changeObj($arr);
                 return $obj;
             } else {
-                $arr= array_intersect_key($arr, array_flip($fields));
+                $arr = array_intersect_key($arr, array_flip($fields));
                 $obj = $this->changeObj($arr);
                 return $obj;
             }
