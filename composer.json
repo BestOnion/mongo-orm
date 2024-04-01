@@ -1,11 +1,23 @@
 {
   "name": "fairwic/mongo-orm",
   "description": "build in fastmongo.mongo orm",
+  "license": "MIT",
+  "keywords": [
+    "php",
+    "swoole",
+    "hyperf",
+    "mongo",
+    "orm"
+  ],
   "autoload": {
     "psr-4": {
       "fairwic\\MongoOrm\\": "src/"
     }
   },
+  "autoload-dev": {
+  "psr-4": {
+  }
+},
   "authors": [
     {
       "name": "fairwic",

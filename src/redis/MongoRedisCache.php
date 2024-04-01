@@ -16,9 +16,6 @@ trait MongoRedisCache
     // 缓存过期时间3h
     protected int $expire = 3600 * 3;
 
-    public function __construct()
-    {
-    }
 
     public function getRedis()
     {
@@ -44,7 +41,7 @@ trait MongoRedisCache
         $arr = $this->getRedis()->exec();
         if ($arr && $arr[0]) {
             if (!$fields) {
-                foreach ($arr as $key => $hmvalues) {
+                foreach ($arr as $hmvalues) {
                     if ($hmvalues) {
                         $redis_res[] = $this->changeObj($hmvalues);
                     }
