@@ -2,13 +2,10 @@
 
 namespace fairwic\MongoOrm;
 
-use App\Controller\Statistics\Statistics;
-use App\Utils\Log;
 use Exception;
 use fairwic\MongoOrm\Elasticsearch\EsInstanceInterface;
 use fairwic\MongoOrm\Elasticsearch\EsTrait;
 use fairwic\MongoOrm\redis\MongoRedisCache;
-use Hyperf\Context\ApplicationContext;
 use Hyperf\GoTask\MongoClient\Collection;
 use Hyperf\GoTask\MongoClient\MongoClient;
 use Psr\Container\ContainerExceptionInterface;
@@ -93,7 +90,7 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
 
     public function getCollection(): Collection
     {
-        return ApplicationContext::getContainer()->get(MongoClient::class)->database($this->database_name)->collection($this->document_name);
+        (new MongoClient())->database($this->database_name)->collection($this->document_name);
     }
 
     /**
@@ -119,7 +116,6 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
                 $this->where('deleted_at', null);
             }
             $result = $this->getCollection()->find($this->filter, $this->option);
-            Log::info('mongo-get查询返回结果', [$result, $this->filter, $this->option]);
         }
 
 
@@ -416,7 +412,6 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
         }
         $this->option['limit'] = 1;
         $result = $this->getCollection()->find($this->filter, $this->option);
-        Log::info('mongo-findbByid查询返回结果', [$result, $this->filter, $this->option]);
         if ($result) {
             $result = $result[0];
             //返回一个Document对象
@@ -455,7 +450,6 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
         //$result = $this->col->findOne($this->filter, $this->option);
         $this->option['limit'] = 1;
         $result = $this->getCollection()->find($this->filter, $this->option);
-        Log::info('mongo-first查询返回结果', [$result, $this->filter, $this->option]);
         if ($result) {
             //取第一个
             $result = $result[0];
