@@ -117,8 +117,6 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
             }
             $result = $this->getCollection()->find($this->filter, $this->option);
         }
-
-
         return $result;
     }
 
