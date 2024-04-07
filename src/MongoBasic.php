@@ -114,9 +114,6 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
             }
             $result = $this->getCollection()->aggregate($this->pipleline, $this->option);
         } else {
-            if ($this->isSoftDelete) {
-                $this->where('deleted_at', null);
-            }
             $result = $this->getCollection()->find($this->filter, $this->option);
         }
         return $result;
@@ -533,6 +530,18 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
     public function chunk(int $num, callable $callable): array
     {
         return $this->collections;
+    }
+
+    /**
+     * @param bool $bool
+     * @return MongoBasic
+     */
+    public function withTrashed(bool $bool = true)
+    {
+        if ($bool) {
+            $this->isSoftDelete = false;
+        }
+        return $this;
     }
 
     /**
