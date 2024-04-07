@@ -6,6 +6,7 @@ use Exception;
 use fairwic\MongoOrm\Elasticsearch\EsInstanceInterface;
 use fairwic\MongoOrm\Elasticsearch\EsTrait;
 use fairwic\MongoOrm\redis\MongoRedisCache;
+use Hyperf\Context\ApplicationContext;
 use Hyperf\GoTask\MongoClient\Collection;
 use Hyperf\GoTask\MongoClient\MongoClient;
 use Psr\Container\ContainerExceptionInterface;
@@ -90,7 +91,8 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
 
     public function getCollection(): Collection
     {
-        (new MongoClient())->database($this->database_name)->collection($this->document_name);
+         return ApplicationContext::getContainer()->get(MongoClient::class)->database($this->database_name)->collection($this->document_name);
+//        (new MongoClient())->database($this->database_name)->collection($this->document_name);
     }
 
     /**
