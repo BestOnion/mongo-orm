@@ -24,6 +24,8 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
 
     const UPDATED_AT = 'updated_at';
 
+    const DELETED_AT = 'deleted_at';
+
     protected ?string $dateFormat = 'U';
 
 
@@ -91,8 +93,8 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
 
     public function getCollection(): Collection
     {
-         return ApplicationContext::getContainer()->get(MongoClient::class)->database($this->database_name)->collection($this->document_name);
-//        (new MongoClient())->database($this->database_name)->collection($this->document_name);
+        return ApplicationContext::getContainer()->get(MongoClient::class)->database($this->database_name)->collection($this->document_name);
+        //        (new MongoClient())->database($this->database_name)->collection($this->document_name);
     }
 
     /**
@@ -221,7 +223,7 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
                 return parse_object_id($item);
             }, $value);
         }
-        $array = [$field => ['$in' => $value]];
+        $array = [$field => ['$in' => array_values($value)]];
         $this->filter = array_merge($this->filter, $array);
         return $this;
     }
@@ -682,13 +684,14 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
             } else {
                 $arr[$key] = $value;
                 //处理返回时间格式
-                if ($key == self::CREATED_AT || $key == self::UPDATED_AT) {
+                if ($key == self::CREATED_AT || $key == self::UPDATED_AT || $key == self::DELETED_AT) {
                     if ($this->dateFormat == 'U') {
                         try {
                             if (gettype($value) == 'integer') {
                                 $arr[$key] = date('Y-m-d H:i:s', $value);
                             }
                         } catch (\Throwable $e) {
+                            throw new Exception($e->getMessage());
                         }
                     }
                 }
