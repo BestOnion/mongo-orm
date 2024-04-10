@@ -642,6 +642,14 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
         return $this->getCollection()->countDocuments($this->filter, $this->option);
     }
 
+    /**
+     * @return array
+     */
+    public function getFilter()
+    {
+        return $this->filter;
+    }
+
 
     /**
      * @param $filter
