@@ -86,6 +86,14 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
     ];
 
     /**
+     * @return string
+     */
+    public function getDocumentName(): string
+    {
+        return $this->document_name;
+    }
+
+    /**
      * @return Collection
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
@@ -524,14 +532,22 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
         return $this;
     }
 
-    /**
-     * @param int $num
-     * @param callable $callable
-     * @return array
-     */
-    public function chunk(int $num, callable $callable): array
-    {
-        return $this->collections;
+    public function chunk($filter, $batchSize, callable $callback) {
+        $cursor = $this->collections->e("$this->databaseName.$this->collectionName", $query);
+
+        $batch = [];
+        foreach ($cursor as $document) {
+            $batch[] = $document;
+
+            if (count($batch) === $batchSize) {
+                $callback($batch);
+                $batch = [];
+            }
+        }
+
+        if (!empty($batch)) {
+            $callback($batch);
+        }
     }
 
     /**
