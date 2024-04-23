@@ -51,8 +51,11 @@ class DocumentArr implements \ArrayAccess
      */
     public function __set(string $name, $value)
     {
-        //        var_dump(__FUNCTION__);
         if (!array_key_exists($name, $this->attributes)) {
+            //新增key
+            $this->attributes[$name] = $value;
+        }else{
+            //更新值
             $this->attributes[$name] = $value;
         }
     }
