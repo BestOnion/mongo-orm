@@ -532,24 +532,6 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
         return $this;
     }
 
-    public function chunk($filter, $batchSize, callable $callback) {
-        $cursor = $this->collections->e("$this->databaseName.$this->collectionName", $query);
-
-        $batch = [];
-        foreach ($cursor as $document) {
-            $batch[] = $document;
-
-            if (count($batch) === $batchSize) {
-                $callback($batch);
-                $batch = [];
-            }
-        }
-
-        if (!empty($batch)) {
-            $callback($batch);
-        }
-    }
-
     /**
      * @param bool $bool
      * @return MongoBasic
@@ -704,7 +686,14 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
             //处理主键
             if ($key == '_id') {
                 $tempkey = $this->primaryKey;
-                $arr[$tempkey] = (string)$value;
+                $keyType = gettype($value);
+                if ($keyType == 'object') {
+                    $arr[$tempkey] = (string)$value;
+                } else if ($keyType == 'array') {
+                    $arr[$tempkey] = $value['$oid'];
+                } else {
+                    $arr[$tempkey] = $value;
+                }
             } else {
                 $arr[$key] = $value;
                 //处理返回时间格式
