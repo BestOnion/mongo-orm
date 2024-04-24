@@ -120,7 +120,7 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
         }
         if ($this->pipleline) {
             if ($this->isSoftDelete) {
-                $this->pipleline['deleted_at'] = null;
+                $this->pipleline[]=['$match'=>['deleted_at' =>null]];
             }
             $result = $this->getCollection()->aggregate($this->pipleline, $this->option);
         } else {
