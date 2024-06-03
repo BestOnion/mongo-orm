@@ -120,7 +120,7 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
         }
         if ($this->pipleline) {
             if ($this->isSoftDelete) {
-                $this->pipleline[]=['$match'=>['deleted_at' =>null]];
+                $this->pipleline[] = ['$match' => ['deleted_at' => null]];
             }
             $result = $this->getCollection()->aggregate($this->pipleline, $this->option);
         } else {
@@ -637,6 +637,12 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
         foreach ($this->columns as $value) {
             $this->option['projection'][$value] = 1;
         }
+        //只过滤_id字段
+        $this->option = [
+            '$project' => [
+                "_id" => 1, // 只保留必要的字段，减小数据传输量
+            ]
+        ];
         return $this->getCollection()->countDocuments($this->filter, $this->option);
     }
 
