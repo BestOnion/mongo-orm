@@ -634,22 +634,30 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
         if ($this->isSoftDelete) {
             $this->filter['deleted_at'] = null;
         }
-        foreach ($this->columns as $value) {
-            $this->option['projection'][$value] = 1;
+        // 构建聚合管道
+        $pipeline = [];
+        if ($this->filter) {
+            $pipeline[] = ['$match' => $this->filter];
         }
-        //只过滤_id字段
-        $this->option = [
+        $pipeline[] = [
             '$project' => [
                 "_id" => 1, // 只保留必要的字段，减小数据传输量
+            ]];
+        $pipeline[] = [
+            '$group' => [
+                '_id' => null, // 使用 _id: null 减少数据传输量
+                'n' => ['$sum' => 1]
             ]
         ];
-        return $this->getCollection()->countDocuments($this->filter, $this->option);
+        $res = $this->getCollection()->aggregate($pipeline, $this->option);
+        return $res ? $res[0]['n'] : 0;
     }
 
     /**
      * @return array
      */
-    public function getFilter()
+    public
+    function getFilter()
     {
         return $this->filter;
     }
@@ -660,7 +668,8 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
      * @param $where
      * @return mixed|void
      */
-    public function mergeFilter($filter, $where)
+    public
+    function mergeFilter($filter, $where)
     {
         $array = $filter;
         foreach ($where as $key => $value) {
@@ -684,7 +693,8 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
      * @param mixed $data
      * @return MongoBasic
      */
-    public function getDocument(mixed $data): MongoBasic
+    public
+    function getDocument(mixed $data): MongoBasic
     {
         $doc = new static();
         $arr = [];
@@ -726,7 +736,8 @@ class MongoBasic extends DocumentArr implements \JsonSerializable
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public function save(array $data = []): string
+    public
+    function save(array $data = []): string
     {
         if (!$data) {
             $data = $this->attributes;
